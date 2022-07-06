@@ -1,0 +1,224 @@
+<head>
+    <script type="text/javascript" src="http://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+
+
+<style>
+    #books {
+    font-family: 'Ubuntu', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    
+    }
+#books tr:nth-child(even){background-color: #f2f2f2;}
+#books tr:hover {background-color: #ddd;}
+#books th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  
+  background-color: chocolate;
+  color: white;
+}
+.sign {
+        padding-top: 10px;
+        color: #8C55AA;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: bold;
+        font-size: 26px;
+    }
+.submitbutton {
+      cursor: pointer;
+        border-radius: 5em;
+        color: #fff;
+        background: linear-gradient(to right, #9C27B0, #E040FB);
+        border: 0;
+        padding-left: 40px;
+        padding-right: 40px;
+        padding-bottom: 10px;
+        padding-top: 10px;
+        margin: 30px;
+        margin-left:45% ;
+        font-family: 'Ubuntu', sans-serif;
+        font-size: 13px;
+        box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+    }
+    .submitbutton { transition: all .2s ease-in-out; }
+    .submitbutton:hover { transform: scale(1.1); }
+    
+    .incdec {
+        cursor: pointer;
+        border-radius: 5em;
+        color: #fff;
+        background: linear-gradient(to right, rgb(255, 182, 130),rgb(199, 78, 65));
+        border: 0;
+        box-shadow: 0 0 20px 1px rgba(0, 0, 0, 0.04);
+    }
+    #manage{
+        margin-top: -5px;
+        margin-left: 43%;
+        
+
+    }
+
+
+
+    input[type=text] {
+    width: 200px;
+    padding: 5px 10px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 3px solid #ccc;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+    }
+
+    input[type=text]:focus {
+    border: 3px solid #555;
+    }
+
+    input[type=number] {
+    
+    width: 200px;
+    padding: 5px 10px;
+    margin: 4px 0;
+    box-sizing: border-box;
+    border: 3px solid #ccc;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    outline: none;
+    }
+
+    input[type=number]:focus {
+    border: 3px solid #555;
+    }
+
+    #divs{
+        margin-left: 43%;
+    }
+    #logout{
+        margin-top: -30px;
+    }
+    #checkedbooks{
+        margin-top: -35px;
+        margin-left: 43%;
+    }
+
+</style>
+
+
+<p class="sign" align="center">Welcome Admin</p>
+
+
+<form action="/managebooks" method="GET">
+    <button type="submit" class = "submitbutton" id="manage">Manage Books</button>
+    
+</form>
+
+
+<form action="/checkedbooks" method="GET">
+    <button type="submit" class = "submitbutton" id="checkedbooks">Checked Books</button>
+    
+</form>
+
+
+
+<table id="books" >  
+    <thead>  
+        <tr align="center">
+            <th>Book ID</th>  
+            <th>Book Name</th>  
+            <th>Book Count</th>  
+            <th>+</th>
+            <th>-</th>
+        </tr>  
+    </thead>  
+
+     <tbody>  
+     <% print.forEach(function (book) { %>
+        <tr align="center">
+            <td><%=book.book_id %></td>  
+            <td type = "text" id = "<%=book.book_name %>"><%=book.book_name %></td>
+            <td><%=book.book_count %></td>
+            <td><button class = "incdec" onclick="incBookCount('<%=book.book_id %>','<%=book.book_count %>')" type ="submit" id= "<%=book.book_id %>">+</button></td>
+            <td><button class = "incdec"onclick="decBookCount('<%=book.book_id %>','<%=book.book_count %>')" type ="submit" id= "<%=book.book_id %>">-</button></td>
+        </tr>                       
+     <% }) %>
+     </tbody>
+     
+</table>   
+    
+
+<form action="/addbooks" method="POST">
+
+    <div id="divs">
+        <label for="book_name">Book Name</label>
+        <br>
+        <input class="inputP"type="text" id="book_name" name = "book_name" required>
+    </div>
+    <div id="divs">
+        <label for="book_count">Book Count</label>
+        <br>
+        <input class="inputP"type="number" id="book_count" name = "book_count" required>
+    </div>
+
+    <button id="adder" class = "submitbutton"type="submit">Add Book(s)</button>
+    
+</form>
+
+<button id = "logout" class="submitbutton" align="center" onclick= "logoutUser()" type="button">&#160&#160&#160&#160Log out&#160&#160&#160&#160</button>
+    
+
+
+
+<script>
+
+    function logoutUser()
+    {    
+        
+        //console.log("redirect");
+        window.location = "/";
+    }
+
+    function incBookCount(clicked,count){
+        // console.log(clicked);
+        // console.log(count);
+
+        $.ajax({
+            type: "POST",
+            url: "/increase",
+            data : {book_id : clicked, book_count : count},
+            success: function(msg){
+                window.location="/admin";
+                console.log("success");
+        }
+        }); 
+
+      
+        
+        //window.location="/admin";
+    }
+    function decBookCount(clicked,count){
+        console.log(clicked);
+        console.log(count);
+        console.log("decreasing");
+
+        $.ajax({
+            type: "POST",
+            url: "/decrease",
+            data : {book_id : clicked,book_count:count},
+            success: function(msg){
+                window.location="/admin";
+                console.log("success");
+        }
+        }); 
+
+ 
+        //location.reload();
+        //window.location="/admin";
+    }
+
+</script>
+
